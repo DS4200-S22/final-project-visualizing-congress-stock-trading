@@ -10,7 +10,7 @@ let svg = d3.select("#vis-container")
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-const svg2 = d3.select("#vis-container")
+const svg2 = d3.select("#vis-container2")
                 .append("svg")
                 .attr("width", width + margin.left + margin.right + 100 )
                 .attr("height", height - margin.top - margin.bottom)
@@ -57,15 +57,6 @@ d3.csv("data/Purchase.csv").then((data) => {
       .text(function(d){ return d.data.name})
       .attr("font-size", "10px")
       .attr("fill", "white")
-
-    svg.append("text")
-    .attr("x", (width / 2))             
-    .attr("y", 0 - (margin.top / 2))
-    .attr("text-anchor", "middle")  
-    .style("font-size", "20px") 
-    .style("text-decoration", "underline")  
-    .text("Purchases by Congress Disclosed as of 2020");
-
 })
 
 const color = d3.scaleOrdinal()
@@ -154,7 +145,7 @@ d3.csv("data/Frequency.csv").then((data) => {
     .attr("text-anchor", "middle")  
     .style("font-size", "10px") 
     .style("text-decoration", "underline")  
-    .text("Congressional Trade Frequency");
+    .text("Top 5 Congressional Traders by Volume");
 })
 
  
