@@ -158,44 +158,62 @@ d3.csv("data/Frequency.csv").then((data) => {
 
 d3.csv("data/Date_Volume.csv",
 
-  // When reading the csv, I must format variables:
+  // Format the date variable
   function(d){
     return { date : d3.timeParse("%m/%d/%Y")(d.date), volume : d.volume }
   }).then(
 
-  // Now I can use this dataset:
+  
   function(data) {
 
-    // Add X axis --> it is a date format
-    let xAxis = d3.scaleTime()
+    // Build x time scale
+    let xScale3 = d3.scaleTime()
       .domain(d3.extent(data, function(d) { return d.date; }))
       .range([ 0, width ]);
 
+    // Add x axis to graph
     svg3.append("g")
-      .attr("transform", `translate(0, ${height})`)
-      .call(d3.axisBottom(xAxis));
+      .attr("transform", `translate(${150}, ${height})`)
+      .call(d3.axisBottom(xScale3))
+      .attr("font-size", '10px') 
+      .call((g) => g.append("text")
+                    .attr("x", width - 125)
+                    .attr("y", margin.bottom)
+                    .attr("fill", "black")
+                    .attr("text-anchor", "end")
+                    .text("Time"));
 
-
+    //Fin max y value
     let maxY3 = d3.max(data, (d) => { return +d.volume; });
-    // Add Y axis
-    let yAxis = d3.scaleLinear()
-      .domain([0, maxY3])
-      .range([ height, 0 ]);
 
+    //Build y linear scale
+    let yScale3 = d3.scaleLinear()
+      .domain([0,maxY3])
+      .range([height, 0]);
 
+    //Add y axis 
     svg3.append("g")
-      .call(d3.axisLeft(yAxis));
+      .attr("transform", `translate(${150}, 0)`)
+      .call(d3.axisLeft(yScale3))
+      .attr("font-size", '10px') 
+      .call((g) => g.append("text")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("fill", "black")
+                    .attr("text-anchor", "end")
+                    .text("Volume of Transactions in USD"));
 
 
-    // Add the line
+    // Add line component
     svg3.append("path")
+      .attr("transform", `translate(${150}, 0)`)
       .datum(data)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
       .attr("stroke-width", 1.5)
       .attr("d", d3.line()
-        .x((d) => xAxis(d.date))
-        .y((d) => yAxis(+d.volume))
+        .x((d) => xScale3(d.date))
+        .y((d) => yScale3(d.volume))
         )
 
 })
