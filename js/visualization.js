@@ -16,6 +16,13 @@ const svg2 = d3.select("#vis-container2")
                 .attr("height", height - margin.top - margin.bottom)
                 .attr("viewBox", [0, 0, width, height]); 
 
+const svg3 = d3.select("#vis-container3")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
 d3.csv("data/Purchase.csv").then((data) => {
 
   let data2 = data.slice(0,20);
@@ -146,6 +153,51 @@ d3.csv("data/Frequency.csv").then((data) => {
     .style("font-size", "10px") 
     .style("text-decoration", "underline")  
     .text("Top 5 Congressional Traders by Volume");
+})
+
+
+d3.csv("data/Date_Volume.csv",
+
+  // When reading the csv, I must format variables:
+  function(d){
+    return { date : d3.timeParse("%m/%d/%Y")(d.date), volume : d.volume }
+  }).then(
+
+  // Now I can use this dataset:
+  function(data) {
+
+    // Add X axis --> it is a date format
+    let xAxis = d3.scaleTime()
+      .domain(d3.extent(data, function(d) { return d.date; }))
+      .range([ 0, width ]);
+
+    svg3.append("g")
+      .attr("transform", `translate(0, ${height})`)
+      .call(d3.axisBottom(xAxis));
+
+
+    let maxY3 = d3.max(data, (d) => { return +d.volume; });
+    // Add Y axis
+    let yAxis = d3.scaleLinear()
+      .domain([0, maxY3])
+      .range([ height, 0 ]);
+
+
+    svg3.append("g")
+      .call(d3.axisLeft(yAxis));
+
+
+    // Add the line
+    svg3.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x((d) => xAxis(d.date))
+        .y((d) => yAxis(+d.volume))
+        )
+
 })
 
  
