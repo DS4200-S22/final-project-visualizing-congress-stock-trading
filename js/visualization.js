@@ -1,4 +1,4 @@
-var margin = {top: 40, right: 20, bottom: 20, left: 20},
+let margin = {top: 40, right: 20, bottom: 20, left: 20},
   width = 800 - margin.left - margin.right,
   height = 445 - margin.top - margin.bottom;
 
@@ -9,6 +9,42 @@ let svg = d3.select("#vis-container")
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // creating the tool tip
+let Tooltip = d3.select("#vis-container")
+.append("div")
+.style("opacity", 0)
+.attr("class", "tooltip")
+.style("background-color", "red")
+.style("border", "solid")
+.style("width", "120px")
+.style("height", "100px")
+.style("top", "250px")
+.style("right", "250px")
+.style("border-width", "2px")
+.style("border-radius", "5px")
+.style("padding", "5px")
+
+let mouseover = function(d) {
+  if (d.relatedTarget !== undefined) {
+    console.log(d.relatedTarget.__data__.data);
+  }
+  
+  Tooltip
+    .style("opacity", 1)
+    .html("Ticker: " + d.relatedTarget.__data__.data.name + "<br/>Value: " + d.relatedTarget.__data__.data.value)
+  d3.select(this)
+    .style("stroke", "black")
+    .style("color", "red")
+    .style("opacity", 1)
+}
+let mousemove = function(d) {
+  Tooltip
+    .style("right", (d.pageX + "px"))
+    .style("top", (d.pageY + "px"));
+}
+
+
 
 const svg2 = d3.select("#vis-container2")
                 .append("svg")
@@ -23,12 +59,15 @@ const svg3 = d3.select("#vis-container3")
                     .append("g")
                     .attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
+
 d3.csv("data/Purchase.csv").then((data) => {
+
+  
 
   let data2 = data.slice(0,20);
 
   // stratifies the data for D3
-  var root = d3.stratify()
+  let root = d3.stratify()
     .id(function(d) { return d.name; }) // name of entity
     .parentId(function(d) {return d.parent; }) // name of parent
     (data2);
@@ -51,7 +90,9 @@ d3.csv("data/Purchase.csv").then((data) => {
       .attr('width', function (d) { return d.x1 - d.x0; })
       .attr('height', function (d) { return d.y1 - d.y0; })
       .style("stroke", "black")
-      .style("fill", "#69b3a2");
+      .style("fill", "#69b3a2")
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove);
 
   // Adds the stock labels
   svg
