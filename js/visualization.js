@@ -173,11 +173,11 @@ d3.csv("data/Date_Volume.csv",
 
     // Add x axis to graph
     svg3.append("g")
-      .attr("transform", `translate(${150}, ${height})`)
+      .attr("transform", `translate(${125}, ${height})`)
       .call(d3.axisBottom(xScale3))
       .attr("font-size", '10px') 
       .call((g) => g.append("text")
-                    .attr("x", width - 125)
+                    .attr("x", width - 110)
                     .attr("y", margin.bottom)
                     .attr("fill", "black")
                     .attr("text-anchor", "end")
@@ -193,7 +193,7 @@ d3.csv("data/Date_Volume.csv",
 
     //Add y axis 
     svg3.append("g")
-      .attr("transform", `translate(${150}, 0)`)
+      .attr("transform", `translate(${125}, 0)`)
       .call(d3.axisLeft(yScale3))
       .attr("font-size", '10px') 
       .call((g) => g.append("text")
