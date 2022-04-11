@@ -258,53 +258,50 @@ d3.csv("data/Date_Volume.csv",
 
 })
 
-const getTopFive = function(data) {
-
+function getByStockTicker(map, searchVal) {
+  for (let [key, value] of map.entries()){
+    if (key === searchVal) {
+      return {ticker: key, values: value}
+    }
+  };
 }
+function getAggregatedData(data, searchTicker) {
+  let filteredStocks = d3.group(data, d => d.ticker);
 
+  console.log(groupedTickers)
 
-d3.csv('data/CongressionalTrading.csv').then((data) => {
-  console.log(data);
-  const groupedTickers = d3.group(data, d => d.ticker);
+  if(searchTicker) {
+    filteredStocks = getByStockTicker(groupedTickers, searchTicker);
+  }
 
-  const congressManInformation = {};
+  const congressInvestments = {};
 
-  for (const [key, value] of groupedTickers.entries()) {
+  for (const [key, value] of filteredStocks.entries()) {
     value.map(d => {
-      if (congressManInformation[d.representative]) {
-        congressManInformation[d.representative] += parseFloat(d.amount);
+      if (congressInvestments[d.representative]) {
+        congressInvestments[d.representative] += parseFloat(d.amount);
       } else {
-        congressManInformation[d.representative] = parseFloat(d.amount);
+        congressInvestments[d.representative] = parseFloat(d.amount);
       }
     });
   }
+  let arrayOfInvestments = [];
 
-  const sortedValues = [];
-  console.log("BLAHHH");
-  console.log(arrayCongressInfo);
+  for (const obj of Object.entries(congressInvestments)) {
 
-  for( obj in arrayCongressInfo) {
-    // console.log(obj);
-    // console.log(value);
-    // sortedValues.push({key: value});
+    arrayOfInvestments.push({name: obj[0], value: obj[1]});
   }
 
-  console.log("The Array");
-  console.log(sortedValues);
+  const sortedInvestments = arrayOfInvestments.sort(function(obj1, obj2) {
+    return obj2.value - obj1.value;
+  });
 
+  return sortedInvestments;
+}
+d3.csv('data/CongressionalTrading.csv').then((data) => {
+  const myData = getAggregatedData(data, "MSFT");
+  
+  console.log(myData);
 
-
-
-
-
-
-  // console.log("array congress info");
-  // console.log(congressManInformation);
-  // const sorted = arrayCongressInfo.sort(function(a, b) {
-  //   return a[1] > b[1];
-  // })
-
-  // console.log("sorted");
-  // console.log(sorted);
 });
 
