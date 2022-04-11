@@ -27,7 +27,6 @@ let Tooltip = d3.select("#vis-container")
 
 let mouseover = function(d) {
   if (d.relatedTarget !== undefined) {
-    console.log(d.relatedTarget.__data__.data);
   }
   
   Tooltip
@@ -259,5 +258,53 @@ d3.csv("data/Date_Volume.csv",
 
 })
 
- 
+const getTopFive = function(data) {
+
+}
+
+
+d3.csv('data/CongressionalTrading.csv').then((data) => {
+  console.log(data);
+  const groupedTickers = d3.group(data, d => d.ticker);
+
+  const congressManInformation = {};
+
+  for (const [key, value] of groupedTickers.entries()) {
+    value.map(d => {
+      if (congressManInformation[d.representative]) {
+        congressManInformation[d.representative] += parseFloat(d.amount);
+      } else {
+        congressManInformation[d.representative] = parseFloat(d.amount);
+      }
+    });
+  }
+
+  const sortedValues = [];
+  console.log("BLAHHH");
+  console.log(arrayCongressInfo);
+
+  for( obj in arrayCongressInfo) {
+    // console.log(obj);
+    // console.log(value);
+    // sortedValues.push({key: value});
+  }
+
+  console.log("The Array");
+  console.log(sortedValues);
+
+
+
+
+
+
+
+  // console.log("array congress info");
+  // console.log(congressManInformation);
+  // const sorted = arrayCongressInfo.sort(function(a, b) {
+  //   return a[1] > b[1];
+  // })
+
+  // console.log("sorted");
+  // console.log(sorted);
+});
 
