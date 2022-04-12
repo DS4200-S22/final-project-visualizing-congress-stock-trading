@@ -31,7 +31,6 @@ let mouseover = function(d) {
   
   Tooltip
     .style("opacity", 1)
-    .html("Ticker: " + d.relatedTarget.__data__.data.name + "<br/>Value: " + d.relatedTarget.__data__.data.value)
   d3.select(this)
     .style("stroke", "black")
     .style("color", "red")
@@ -114,85 +113,6 @@ d3.csv("data/Frequency.csv").then((data) => {
 
   let data3 = data.slice(0,20);
 
-  let x1, y1;
-  let xKey, yKey;
-
-  xKey = "name";
-  yKey = "frequency";
-
-  // Find max x
-  let maxX1 = d3.max(data3, (d) => { return d[xKey]; });
-
-  let xScale1 = d3.scaleBand()
-  .domain(d3.range(data.length))
-  .range([margin.left, width - margin.right])
-  .padding(0.1); 
-
-  // Create X scale
-  x1 = d3.scaleLinear()
-              .domain([0,maxX1])
-              .range([margin.left, width-margin.right]); 
-  
-  // Add x axis 
-  svg2.append("g")
-      .attr("transform", `translate(0,${height - margin.bottom})`) 
-      .call(d3.axisBottom(xScale1).tickFormat(i => data[i].name))
-
-      .attr("font-size", '10px')
-      .call((g) => g.append("text")
-                    .attr("x", width - margin.right)
-                    .attr("y", margin.bottom - 4)
-                    .attr("fill", "black")
-                    .attr("text-anchor", "end")
-                    .text(xKey)
-    );
-
-  // Finx max y 
-  let maxY1 = d3.max(data, (d) => { return d[yKey]; }); 
-
-  // Create y scale   
-  let yScale1 = d3.scaleLinear()
-  .domain([0,maxY1])
-  .range([height-margin.bottom,margin.top]); 
-
-  // Create Y scale
-  y1 = d3.scaleLinear()
-              .domain([0, maxY1])
-              .range([height - margin.bottom, margin.top]); 
-
-  // Add y axis 
-  svg2.append("g")
-      .attr("transform", `translate(${margin.left}, 0)`) 
-      .call(d3.axisLeft(y1)) 
-      .attr("font-size", '10px') 
-      .call((g) => g.append("text")
-                    .attr("x", 0)
-                    .attr("y", margin.top)
-                    .attr("fill", "black")
-                    .attr("text-anchor", "end")
-                    .text(yKey)
-    );
-
-    // Add bars to the webpage
-    bars = svg2.selectAll(".bar") 
-      .data(data) 
-      .enter()  
-      .append("rect") 
-        .attr("id", (data) => data.name)
-        .attr("x", (data,i) => xScale1(i)) 
-        .attr("y", (data) => yScale1(data.frequency)) 
-        .attr("height", (data) => (height - margin.bottom) - yScale1(data.frequency)) 
-        .attr("width", xScale1.bandwidth()) 
-        .style("fill", (data) => color(data.name))
-        .style("opacity", 0.5)
-
-    svg2.append("text")
-    .attr("x", (width / 2))             
-    .attr("y", 445 - (margin.top / 2))
-    .attr("text-anchor", "middle")  
-    .style("font-size", "10px") 
-    .style("text-decoration", "underline")  
-    .text("Top 5 Congressional Traders by Volume");
 })
 
 
@@ -258,25 +178,29 @@ d3.csv("data/Date_Volume.csv",
 
 })
 
-function getByStockTicker(map, searchVal) {
+// helper function for getting Aggregated Data for 
+// Volume of Congressman Trades
+function getByValue(map, searchVal) {
   for (let [key, value] of map.entries()){
     if (key === searchVal) {
-      return {ticker: key, values: value}
+      // make a new map to be returned (to keep data in same state for parent function)
+      const map = new Map();
+      map.set(key, value);
+      return map
     }
   };
 }
-function getAggregatedData(data, searchTicker) {
-  let filteredStocks = d3.group(data, d => d.ticker);
-
-  console.log(groupedTickers)
+// Aggregating data for congressman data
+function getAggregatedDataTopTraders(data, searchTicker) {
+  let groupedTickers = d3.group(data, d => d.ticker);
 
   if(searchTicker) {
-    filteredStocks = getByStockTicker(groupedTickers, searchTicker);
+  groupedTickers = getByValue(groupedTickers, searchTicker);
   }
 
   const congressInvestments = {};
 
-  for (const [key, value] of filteredStocks.entries()) {
+  for (const [key, value] of groupedTickers.entries()) {
     value.map(d => {
       if (congressInvestments[d.representative]) {
         congressInvestments[d.representative] += parseFloat(d.amount);
@@ -298,10 +222,122 @@ function getAggregatedData(data, searchTicker) {
 
   return sortedInvestments;
 }
-d3.csv('data/CongressionalTrading.csv').then((data) => {
-  const myData = getAggregatedData(data, "MSFT");
-  
-  console.log(myData);
 
+// gets aggregated data for a map object with disclosure_date and amoutn.
+function getAggregatedDataTradeVolume(data) {
+  const groupedByDate = d3.group(data, d => d.disclosure_date);
+  
+  const dateTotalVolume = {};
+  for (const [key, value] of groupedByDate.entries()) {
+    value.map(d => {
+    if (dateTotalVolume[key]){
+      dateTotalVolume[key] += parseFloat(d.amount);
+    } else {
+      dateTotalVolume[key] = parseFloat(d.amount);
+      }
+    });
+  };
+
+  return dateTotalVolume;
+
+}
+
+function makeTop5TradersVis(dataTrader) {
+  const data = dataTrader.slice(0,5);
+
+  let x1, y1;
+  let xKey, yKey;
+
+  xKey = "name";
+  yKey = "frequency";
+
+  // Finx max y 
+  let maxY1 = data[0].value; 
+  // Create y scale   
+  let yScale1 = d3.scaleLinear()
+  .domain([0,maxY1])
+  .range([height-margin.bottom,margin.top]); 
+
+  //Find max x
+  let maxX1 = data.length;
+
+  let xScale1 = d3.scaleBand()
+  .domain(d3.range(data.length))
+  .range([margin.left, width - margin.right])
+  .padding(0.1); 
+
+  // Create X scale
+  x1 = d3.scaleLinear()
+              .domain([0,maxX1])
+              .range([margin.left, width-margin.right]); 
+  
+  // Add x axis 
+  svg2.append("g")
+      .attr("transform", `translate(0,${height - margin.bottom})`) 
+      .call(d3.axisBottom(xScale1).tickFormat(i => data[i].name))
+      .attr("font-size", '10px')
+      .call((g) => g.append("text")
+                    .attr("x", width - margin.right)
+                    .attr("y", margin.bottom - 4)
+                    .attr("fill", "black")
+                    .attr("text-anchor", "end")
+                    .text(xKey)
+    );
+
+
+
+  // Create Y scale
+  y1 = d3.scaleLinear()
+              .domain([0, maxY1])
+              .range([height - margin.bottom, margin.top]); 
+
+  // Add y axis 
+  svg2.append("g")
+      .attr("transform", `translate(${margin.left}, 0)`) 
+      .call(d3.axisLeft(y1)) 
+      .attr("font-size", '10px') 
+      .call((g) => g.append("text")
+                    .attr("x", 0)
+                    .attr("y", margin.top)
+                    .attr("fill", "black")
+                    .attr("text-anchor", "end")
+                    .text(yKey)
+    );
+
+    // Add bars to the webpage
+    bars = svg2.selectAll(".bar") 
+      .data(data) 
+      .enter()  
+      .append("rect") 
+        .attr("id", (data) => data.name)
+        .attr("x", (data,i) => xScale1(i)) 
+        .attr("y", (data) => yScale1(data.value)) 
+        .attr("height", (data) => (height - margin.bottom) - yScale1(data.value)) 
+        .attr("width", xScale1.bandwidth()) 
+        .style("fill", (data) => color(data.name))
+        .style("opacity", 0.5)
+
+  //   svg2.append("text")
+  //   .attr("x", (width / 2))             
+  //   .attr("y", 445 - (margin.top / 2))
+  //   .attr("text-anchor", "middle")  
+  //   .style("font-size", "10px") 
+  //   .style("text-decoration", "underline")  
+  //   .text("Top 5 Congressional Traders by Volume");
+};
+
+function makeVolumeOverTimeVis(data) {
+  // console.log(data);
+  // const groupedByDate = data.group(data, d => d.ticker)
+  // console.log(groupedByDate);
+}
+
+d3.csv('data/CongressionalTrading.csv').then((data) => {
+  const myData = getAggregatedDataTopTraders(data, "MSFT");
+  
+  makeTop5TradersVis(myData);
+
+  const volumeData = getAggregatedDataTradeVolume(data);
+  makeVolumeOverTimeVis(volumeData);
 });
 
