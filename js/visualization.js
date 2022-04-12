@@ -344,8 +344,6 @@ function makeVolumeOverTimeVis(data) {
       .y((d) => yScale3(d.value))
       )
 }
-
-
   const myData = getAggregatedDataTopTraders(tradingData);
   
   makeTop5TradersVis(myData);
