@@ -1,3 +1,4 @@
+d3.csv('data/CongressionalTrading.csv').then((tradingData) => {
 let margin = {top: 40, right: 20, bottom: 20, left: 20},
   width = 800 - margin.left - margin.right,
   height = 445 - margin.top - margin.bottom;
@@ -25,14 +26,21 @@ let Tooltip = d3.select("#vis-container")
 .style("border-radius", "5px")
 .style("padding", "5px")
 
+let mouseClick = function(d) {
+  svg2.selectAll("*").remove();
+  svg3.selectAll("*").remove();
+  const top5TradersData = getAggregatedDataTopTraders(tradingData, d.target.__data__.data.name);
+  const tradeVolumeData = getAggregatedDataTradeVolume(tradingData, d.target.__data__.data.name);
+  makeTop5TradersVis(top5TradersData);
+  makeVolumeOverTimeVis(tradeVolumeData);
+}
+
 let mouseover = function(d) {
   if (d.relatedTarget !== undefined) {
-    console.log(d.relatedTarget.__data__.data);
   }
   
   Tooltip
     .style("opacity", 1)
-    .html("Ticker: " + d.relatedTarget.__data__.data.name + "<br/>Value: " + d.relatedTarget.__data__.data.value)
   d3.select(this)
     .style("stroke", "black")
     .style("color", "red")
@@ -40,8 +48,8 @@ let mouseover = function(d) {
 }
 let mousemove = function(d) {
   Tooltip
-    .style("right", (d.pageX + "px"))
-    .style("top", (d.pageY + "px"));
+    .style("left", (d.pageX + 10 + "px"))
+    .style("top", (d.pageY + 5 + "px"));
 }
 
 
@@ -92,6 +100,7 @@ d3.csv("data/Purchase.csv").then((data) => {
       .style("stroke", "black")
       .style("fill", "#69b3a2")
       .on("mouseover", mouseover)
+      .on("click", mouseClick)
       .on("mousemove", mousemove);
 
   // Adds the stock labels
@@ -111,9 +120,96 @@ const color = d3.scaleOrdinal()
                 .domain(["Hon. Josh Gottheimer", "Hon. Gilbert Cisneros", "Hon. Susie Lee", "Hon. Alan S. Lowenthal", "Hon. Donna Shalala"])
                 .range(["#426cf5", "#426cf5", "#426cf5", "#426cf5", "#426cf5"]);
 
-d3.csv("data/Frequency.csv").then((data) => {
+// helper function for getting Aggregated Data for 
+// Volume of Congressman Trades
+function getByValue(map, searchVal) {
+  for (let [key, value] of map.entries()){
+    if (key === searchVal) {
+      // make a new map to be returned (to keep data in same state for parent function)
+      const map = new Map();
+      map.set(key, value);
+      return map
+    }
+  };
+}
+// Aggregating data for congressman data
+function getAggregatedDataTopTraders(data, searchTicker) {
+  let groupedTickers = d3.group(data, d => d.ticker);
 
-  let data3 = data.slice(0,20);
+  if(searchTicker) {
+  groupedTickers = getByValue(groupedTickers, searchTicker);
+  }
+
+  const congressInvestments = {};
+
+  for (const [key, value] of groupedTickers.entries()) {
+    value.map(d => {
+      if (congressInvestments[d.representative]) {
+        congressInvestments[d.representative] += parseFloat(d.amount);
+      } else {
+        congressInvestments[d.representative] = parseFloat(d.amount);
+      }
+    });
+  }
+  let arrayOfInvestments = [];
+
+  for (const obj of Object.entries(congressInvestments)) {
+
+    arrayOfInvestments.push({name: obj[0], value: obj[1]});
+  }
+
+  const sortedInvestments = arrayOfInvestments.sort(function(obj1, obj2) {
+    return obj2.value - obj1.value;
+  });
+
+  return sortedInvestments;
+}
+
+// gets aggregated data for a map object with disclosure_date and amoutn.
+function getAggregatedDataTradeVolume(data, searchTicker) {
+  // if there is a searchTicker, filter the data on that.
+  if (searchTicker) {
+    data = data.filter(obj => obj.ticker === searchTicker);
+  }
+  const groupedByDate = d3.group(data, d => d.disclosure_date);
+  
+  const dateTotalVolume = {};
+  for (const [key, value] of groupedByDate.entries()) {
+    value.map(d => {
+    if (dateTotalVolume[key]){
+      dateTotalVolume[key] += parseFloat(d.amount);
+    } else {
+      dateTotalVolume[key] = parseFloat(d.amount);
+      }
+    });
+  };
+
+  const arrayOfDateVolume = [];
+  // from an object to an array of single objects
+  // fix to be date object
+  for (const obj of Object.entries(dateTotalVolume)) {
+    const newDate =  d3.timeParse("%m/%d/%Y")(obj[0]);
+    arrayOfDateVolume.push({date: newDate, value: obj[1]})
+   
+  }
+  // sort by date
+  const sortedDateVolume = arrayOfDateVolume.sort(function(obj1, obj2) {
+    return obj1['date'] - obj2['date'];
+  });
+
+  // find NaN and fix to 0;
+  for (const idx in sortedDateVolume) {
+    if(isNaN(sortedDateVolume[idx].value)) {
+      sortedDateVolume[idx].value = 0;
+    }
+    
+  }
+  return sortedDateVolume;
+
+}
+
+function makeTop5TradersVis(tradeData) {
+  const data = tradeData.slice(0,5);
 
   let x1, y1;
   let xKey, yKey;
@@ -121,8 +217,15 @@ d3.csv("data/Frequency.csv").then((data) => {
   xKey = "name";
   yKey = "frequency";
 
-  // Find max x
-  let maxX1 = d3.max(data3, (d) => { return d[xKey]; });
+  // Finx max y 
+  let maxY1 = data[0].value; 
+  // Create y scale   
+  let yScale1 = d3.scaleLinear()
+  .domain([0,maxY1])
+  .range([height-margin.bottom,margin.top]); 
+
+  //Find max x
+  let maxX1 = data.length;
 
   let xScale1 = d3.scaleBand()
   .domain(d3.range(data.length))
@@ -138,7 +241,6 @@ d3.csv("data/Frequency.csv").then((data) => {
   svg2.append("g")
       .attr("transform", `translate(0,${height - margin.bottom})`) 
       .call(d3.axisBottom(xScale1).tickFormat(i => data[i].name))
-
       .attr("font-size", '10px')
       .call((g) => g.append("text")
                     .attr("x", width - margin.right)
@@ -148,13 +250,7 @@ d3.csv("data/Frequency.csv").then((data) => {
                     .text(xKey)
     );
 
-  // Finx max y 
-  let maxY1 = d3.max(data, (d) => { return d[yKey]; }); 
 
-  // Create y scale   
-  let yScale1 = d3.scaleLinear()
-  .domain([0,maxY1])
-  .range([height-margin.bottom,margin.top]); 
 
   // Create Y scale
   y1 = d3.scaleLinear()
@@ -181,83 +277,81 @@ d3.csv("data/Frequency.csv").then((data) => {
       .append("rect") 
         .attr("id", (data) => data.name)
         .attr("x", (data,i) => xScale1(i)) 
-        .attr("y", (data) => yScale1(data.frequency)) 
-        .attr("height", (data) => (height - margin.bottom) - yScale1(data.frequency)) 
+        .attr("y", (data) => yScale1(data.value)) 
+        .attr("height", (data) => (height - margin.bottom) - yScale1(data.value)) 
         .attr("width", xScale1.bandwidth()) 
         .style("fill", (data) => color(data.name))
         .style("opacity", 0.5)
 
-    svg2.append("text")
-    .attr("x", (width / 2))             
-    .attr("y", 445 - (margin.top / 2))
-    .attr("text-anchor", "middle")  
-    .style("font-size", "10px") 
-    .style("text-decoration", "underline")  
-    .text("Top 5 Congressional Traders by Volume");
-})
+  //   svg2.append("text")
+  //   .attr("x", (width / 2))             
+  //   .attr("y", 445 - (margin.top / 2))
+  //   .attr("text-anchor", "middle")  
+  //   .style("font-size", "10px") 
+  //   .style("text-decoration", "underline")  
+  //   .text("Top 5 Congressional Traders by Volume");
+};
+
+function makeVolumeOverTimeVis(data) {
+
+  // Build x time scale
+  let xScale3 = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.date; }))
+    .range([ 0, width ]);
+
+  // Add x axis to graph
+  svg3.append("g")
+    .attr("transform", `translate(${125}, ${height})`)
+    .call(d3.axisBottom(xScale3))
+    .attr("font-size", '10px') 
+    .call((g) => g.append("text")
+                  .attr("x", width - 110)
+                  .attr("y", margin.bottom)
+                  .attr("fill", "black")
+                  .attr("text-anchor", "end")
+                  .text("Time"));
+
+  //Fin max y value
+  let maxY3 = d3.max(data, (d) => { return +d.value; });
+
+  //Build y linear scale
+  let yScale3 = d3.scaleLinear()
+    .domain([0,maxY3])
+    .range([height, 0]);
+
+  //Add y axis 
+  svg3.append("g")
+    .attr("transform", `translate(${125}, 0)`)
+    .call(d3.axisLeft(yScale3))
+    .attr("font-size", '10px') 
+    .call((g) => g.append("text")
+                  .attr("x", 0)
+                  .attr("y", 0)
+                  .attr("fill", "black")
+                  .attr("text-anchor", "end")
+                  .text("Volume of Transactions in USD"));
 
 
-d3.csv("data/Date_Volume.csv",
+  // Add line component
+  svg3.append("path")
+    .attr("transform", `translate(${150}, 0)`)
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 1.5)
+    .attr("d", d3.line()
+      .x((d) => xScale3(d.date))
+      .y((d) => yScale3(d.value))
+      )
+}
 
-  // Format the date variable
-  function(d){
-    return { date : d3.timeParse("%m/%d/%Y")(d.date), volume : d.volume }
-  }).then(
 
+  const myData = getAggregatedDataTopTraders(tradingData);
   
-  function(data) {
+  makeTop5TradersVis(myData);
 
-    // Build x time scale
-    let xScale3 = d3.scaleTime()
-      .domain(d3.extent(data, function(d) { return d.date; }))
-      .range([ 0, width ]);
-
-    // Add x axis to graph
-    svg3.append("g")
-      .attr("transform", `translate(${125}, ${height})`)
-      .call(d3.axisBottom(xScale3))
-      .attr("font-size", '10px') 
-      .call((g) => g.append("text")
-                    .attr("x", width - 110)
-                    .attr("y", margin.bottom)
-                    .attr("fill", "black")
-                    .attr("text-anchor", "end")
-                    .text("Time"));
-
-    //Fin max y value
-    let maxY3 = d3.max(data, (d) => { return +d.volume; });
-
-    //Build y linear scale
-    let yScale3 = d3.scaleLinear()
-      .domain([0,maxY3])
-      .range([height, 0]);
-
-    //Add y axis 
-    svg3.append("g")
-      .attr("transform", `translate(${125}, 0)`)
-      .call(d3.axisLeft(yScale3))
-      .attr("font-size", '10px') 
-      .call((g) => g.append("text")
-                    .attr("x", 0)
-                    .attr("y", 0)
-                    .attr("fill", "black")
-                    .attr("text-anchor", "end")
-                    .text("Volume of Transactions in USD"));
-
-
-    // Add line component
-    svg3.append("path")
-      .attr("transform", `translate(${150}, 0)`)
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 1.5)
-      .attr("d", d3.line()
-        .x((d) => xScale3(d.date))
-        .y((d) => yScale3(d.volume))
-        )
-
-})
-
- 
+  // make it so this function can be sorted by stock ticker
+  const volumeData = getAggregatedDataTradeVolume(tradingData);
+  makeVolumeOverTimeVis(volumeData);
+});
 
