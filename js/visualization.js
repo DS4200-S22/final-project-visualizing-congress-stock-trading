@@ -27,10 +27,12 @@ let Tooltip = d3.select("#vis-container")
 .style("padding", "5px")
 
 let mouseClick = function(d) {
-  console.log()
   svg2.selectAll("*").remove();
+  svg3.selectAll("*").remove();
   const top5TradersData = getAggregatedDataTopTraders(tradingData, d.target.__data__.data.name);
+  const tradeVolumeData = getAggregatedDataTradeVolume(tradingData, d.target.__data__.data.name);
   makeTop5TradersVis(top5TradersData);
+  makeVolumeOverTimeVis(tradeVolumeData);
 }
 
 let mouseover = function(d) {
@@ -46,8 +48,8 @@ let mouseover = function(d) {
 }
 let mousemove = function(d) {
   Tooltip
-    .style("right", (d.pageX + "px"))
-    .style("top", (d.pageY + "px"));
+    .style("left", (d.pageX + 10 + "px"))
+    .style("top", (d.pageY + 5 + "px"));
 }
 
 
@@ -164,7 +166,11 @@ function getAggregatedDataTopTraders(data, searchTicker) {
 }
 
 // gets aggregated data for a map object with disclosure_date and amoutn.
-function getAggregatedDataTradeVolume(data) {
+function getAggregatedDataTradeVolume(data, searchTicker) {
+  // if there is a searchTicker, filter the data on that.
+  if (searchTicker) {
+    data = data.filter(obj => obj.ticker === searchTicker);
+  }
   const groupedByDate = d3.group(data, d => d.disclosure_date);
   
   const dateTotalVolume = {};
@@ -194,18 +200,16 @@ function getAggregatedDataTradeVolume(data) {
   // find NaN and fix to 0;
   for (const idx in sortedDateVolume) {
     if(isNaN(sortedDateVolume[idx].value)) {
-      console.log(sortedDateVolume[idx]);
       sortedDateVolume[idx].value = 0;
     }
     
   }
-  console.log(sortedDateVolume);
   return sortedDateVolume;
 
 }
 
-function makeTop5TradersVis(dataTrader) {
-  const data = dataTrader.slice(0,5);
+function makeTop5TradersVis(tradeData) {
+  const data = tradeData.slice(0,5);
 
   let x1, y1;
   let xKey, yKey;
@@ -342,7 +346,7 @@ function makeVolumeOverTimeVis(data) {
 }
 
 
-  const myData = getAggregatedDataTopTraders(tradingData, "MSFT");
+  const myData = getAggregatedDataTopTraders(tradingData);
   
   makeTop5TradersVis(myData);
 
