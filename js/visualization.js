@@ -126,55 +126,58 @@ d3.csv("data/Date_Volume.csv",
   
   function(data) {
 
-    // Build x time scale
-    let xScale3 = d3.scaleTime()
-      .domain(d3.extent(data, function(d) { return d.date; }))
-      .range([ 0, width ]);
+    // console.log("DV");
+    // console.log(data);
 
-    // Add x axis to graph
-    svg3.append("g")
-      .attr("transform", `translate(${125}, ${height})`)
-      .call(d3.axisBottom(xScale3))
-      .attr("font-size", '10px') 
-      .call((g) => g.append("text")
-                    .attr("x", width - 110)
-                    .attr("y", margin.bottom)
-                    .attr("fill", "black")
-                    .attr("text-anchor", "end")
-                    .text("Time"));
+    // // Build x time scale
+    // let xScale3 = d3.scaleTime()
+    //   .domain(d3.extent(data, function(d) { return d.date; }))
+    //   .range([ 0, width ]);
 
-    //Fin max y value
-    let maxY3 = d3.max(data, (d) => { return +d.volume; });
+    // // Add x axis to graph
+    // svg3.append("g")
+    //   .attr("transform", `translate(${125}, ${height})`)
+    //   .call(d3.axisBottom(xScale3))
+    //   .attr("font-size", '10px') 
+    //   .call((g) => g.append("text")
+    //                 .attr("x", width - 110)
+    //                 .attr("y", margin.bottom)
+    //                 .attr("fill", "black")
+    //                 .attr("text-anchor", "end")
+    //                 .text("Time"));
 
-    //Build y linear scale
-    let yScale3 = d3.scaleLinear()
-      .domain([0,maxY3])
-      .range([height, 0]);
+    // //Fin max y value
+    // let maxY3 = d3.max(data, (d) => { return +d.volume; });
 
-    //Add y axis 
-    svg3.append("g")
-      .attr("transform", `translate(${125}, 0)`)
-      .call(d3.axisLeft(yScale3))
-      .attr("font-size", '10px') 
-      .call((g) => g.append("text")
-                    .attr("x", 0)
-                    .attr("y", 0)
-                    .attr("fill", "black")
-                    .attr("text-anchor", "end")
-                    .text("Volume of Transactions in USD"));
+    // //Build y linear scale
+    // let yScale3 = d3.scaleLinear()
+    //   .domain([0,maxY3])
+    //   .range([height, 0]);
+
+    // //Add y axis 
+    // svg3.append("g")
+    //   .attr("transform", `translate(${125}, 0)`)
+    //   .call(d3.axisLeft(yScale3))
+    //   .attr("font-size", '10px') 
+    //   .call((g) => g.append("text")
+    //                 .attr("x", 0)
+    //                 .attr("y", 0)
+    //                 .attr("fill", "black")
+    //                 .attr("text-anchor", "end")
+    //                 .text("Volume of Transactions in USD"));
 
 
-    // Add line component
-    svg3.append("path")
-      .attr("transform", `translate(${150}, 0)`)
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 1.5)
-      .attr("d", d3.line()
-        .x((d) => xScale3(d.date))
-        .y((d) => yScale3(d.volume))
-        )
+    // // Add line component
+    // svg3.append("path")
+    //   .attr("transform", `translate(${150}, 0)`)
+    //   .datum(data)
+    //   .attr("fill", "none")
+    //   .attr("stroke", "steelblue")
+    //   .attr("stroke-width", 1.5)
+    //   .attr("d", d3.line()
+    //     .x((d) => xScale3(d.date))
+    //     .y((d) => yScale3(d.volume))
+    //     )
 
 })
 
@@ -238,7 +241,28 @@ function getAggregatedDataTradeVolume(data) {
     });
   };
 
-  return dateTotalVolume;
+  const arrayOfDateVolume = [];
+  // from an object to an array of single objects
+  // fix to be date object
+  for (const obj of Object.entries(dateTotalVolume)) {
+    const newDate =  d3.timeParse("%m/%d/%Y")(obj[0]);
+    arrayOfDateVolume.push({date: newDate, value: obj[1]})
+   
+  }
+  // sort by date
+  const sortedDateVolume = arrayOfDateVolume.sort(function(obj1, obj2) {
+    return obj1['date'] - obj2['date'];
+  });
+
+  // find NaN and fix to 0;
+  for (const idx in sortedDateVolume) {
+    if(isNaN(sortedDateVolume[idx].value)) {
+      sortedDateVolume[idx].value = 0;
+    }
+    
+  }
+  console.log(sortedDateVolume);
+  return sortedDateVolume;
 
 }
 
@@ -330,6 +354,56 @@ function makeVolumeOverTimeVis(data) {
   // console.log(data);
   // const groupedByDate = data.group(data, d => d.ticker)
   // console.log(groupedByDate);
+
+  // Build x time scale
+  let xScale3 = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.date; }))
+    .range([ 0, width ]);
+
+  // Add x axis to graph
+  svg3.append("g")
+    .attr("transform", `translate(${125}, ${height})`)
+    .call(d3.axisBottom(xScale3))
+    .attr("font-size", '10px') 
+    .call((g) => g.append("text")
+                  .attr("x", width - 110)
+                  .attr("y", margin.bottom)
+                  .attr("fill", "black")
+                  .attr("text-anchor", "end")
+                  .text("Time"));
+
+  //Fin max y value
+  let maxY3 = d3.max(data, (d) => { return +d.value; });
+
+  //Build y linear scale
+  let yScale3 = d3.scaleLinear()
+    .domain([0,maxY3])
+    .range([height, 0]);
+
+  //Add y axis 
+  svg3.append("g")
+    .attr("transform", `translate(${125}, 0)`)
+    .call(d3.axisLeft(yScale3))
+    .attr("font-size", '10px') 
+    .call((g) => g.append("text")
+                  .attr("x", 0)
+                  .attr("y", 0)
+                  .attr("fill", "black")
+                  .attr("text-anchor", "end")
+                  .text("Volume of Transactions in USD"));
+
+
+  // Add line component
+  svg3.append("path")
+    .attr("transform", `translate(${150}, 0)`)
+    .datum(data)
+    .attr("fill", "none")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 1.5)
+    .attr("d", d3.line()
+      .x((d) => xScale3(d.date))
+      .y((d) => yScale3(d.value))
+      )
 }
 
 d3.csv('data/CongressionalTrading.csv').then((data) => {
@@ -337,6 +411,7 @@ d3.csv('data/CongressionalTrading.csv').then((data) => {
   
   makeTop5TradersVis(myData);
 
+  // make it so this function can be sorted by stock ticker
   const volumeData = getAggregatedDataTradeVolume(data);
   makeVolumeOverTimeVis(volumeData);
 });
