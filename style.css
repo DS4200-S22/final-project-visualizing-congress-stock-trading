@@ -23,8 +23,16 @@ h3 {
 .vis-holder,
 .vis-holder2,
 .vis-holder3 {
-  width: 100%;
+  width: 50%;
   height: 100%;
-  max-width: 65%;
+  /* max-width: 65%; */
   margin: 40px auto;
+}
+
+.full-vis-container {
+  background-color: lightgray;
+}
+
+.explaination-text {
+  margin-top: 50px;
 }
