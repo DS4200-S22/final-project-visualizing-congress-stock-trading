@@ -11,21 +11,55 @@ let svg = d3.select("#vis-container")
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            // creating the tool tip
+// creating the first tool tip
 let Tooltip = d3.select("#vis-container")
 .append("div")
 .style("opacity", 0)
 .attr("class", "tooltip")
-.style("background-color", "red")
+.style("background-color", "#B1DEDF")
 .style("border", "solid")
-.style("width", "120px")
-.style("height", "100px")
+.style("width", "140px")
+.style("height", "50px")
 .style("top", "250px")
 .style("right", "250px")
 .style("border-width", "2px")
 .style("border-radius", "5px")
 .style("padding", "5px")
 
+//creating the second tooltip
+let Tooltip2 =  d3.select("#vis-container2")
+.append("div")
+.style("opacity", 0)
+.attr("class", "tooltip")
+.style("background-color", "#B1DEDF")
+.style("border", "solid")
+.style("width", "120px")
+.style("height", "60px")
+.style("top", "250px")
+.style("right", "250px")
+.style("border-width", "2px")
+.style("border-radius", "5px")
+.style("padding", "5px")
+
+//creating the third tool tip
+let Tooltip3 = d3.select("#vis-container3")
+.append("div")
+.style("opacity", 0)
+.attr("class", "tooltip")
+.style("background-color", "#B1DEDF")
+.style("border", "solid")
+.style("width", "120px")
+.style("height", "30px")
+.style("top", "250px")
+.style("right", "250px")
+.style("border-width", "2px")
+.style("border-radius", "5px")
+.style("padding", "5px")
+
+
+let clickedTicker;
+
+//event handler for mouseClick
 let mouseClick = function(d) {
   svg2.selectAll("*").remove();
   svg3.selectAll("*").remove();
@@ -33,8 +67,10 @@ let mouseClick = function(d) {
   const tradeVolumeData = getAggregatedDataTradeVolume(tradingData, d.target.__data__.data.name);
   makeTop5TradersVis(top5TradersData);
   makeVolumeOverTimeVis(tradeVolumeData);
+  clickedTicker = d.target.__data__.data.name;
 }
 
+//event handler for mouseover for first graph
 let mouseover = function(d) {
   if (d.relatedTarget !== undefined) {
   }
@@ -43,16 +79,77 @@ let mouseover = function(d) {
     .style("opacity", 1)
   d3.select(this)
     .style("stroke", "black")
-    .style("color", "red")
+    .style("color", "#B1DEDF")
     .style("opacity", 1)
+
 }
+
+//event handler for mouseover for second graph
+let mouseover2 = function(d) {
+  if (d.relatedTarget !== undefined) {
+  }
+  
+  Tooltip2
+    .style("opacity", 1)
+  d3.select(this)
+    .style("stroke", "black")
+    .style("color", "#B1DEDF")
+    .style("opacity", 1)
+
+}
+
+//event handler for mouseover for third graph
+let mouseover3 = function(d) {
+  if (d.relatedTarget !== undefined) {
+  }
+  
+  Tooltip3
+    .style("opacity", 1)
+  d3.select(this)
+    .style("stroke", "steel-blue")
+    .style("color", "#B1DEDF")
+    .style("opacity", 1)
+
+}
+
+//event handler for mousemove for first graph
 let mousemove = function(d) {
   Tooltip
     .style("left", (d.pageX + 10 + "px"))
-    .style("top", (d.pageY + 5 + "px"));
+    .style("top", (d.pageY + 5 + "px"))
+    .text(d.target.__data__.data.name+":"+"\n"+"$"+Intl.NumberFormat("en-US").format(d.target.__data__.data.value))
+}
+
+//event handler for mousemove2 for the second graph
+let mousemove2 = function(d) {
+
+  let repName = d.target.id
+
+  Tooltip2
+    .style("left", (d.pageX + 10 + "px"))
+    .style("top", (d.pageY + 5 + "px"))
+    .text("District: "+getPartyandDistrict(tradingData,repName).district+", "+"Party: "+getPartyandDistrict(tradingData,repName).party)
+
+    console.log(d.target)
 }
 
 
+
+//event handler for mousemove for the third graph
+let mousemove3 = function(d) {
+  //find the current maximum value for the third graph
+  let maxY3 = d3.max(getAggregatedDataTradeVolume(tradingData, clickedTicker), (d) => { return +d.value; });
+  
+  //make inverted scale for tooltip
+  let yScale3Inverted = d3.scaleLinear()
+    .domain([height, 0])
+    .range([0,maxY3]);
+
+  Tooltip3
+    .style("left", (d.pageX + 10 + "px"))
+    .style("top", (d.pageY + 5 + "px"))
+    .text("$"+Intl.NumberFormat("en-US").format(yScale3Inverted(d3.pointer(d,this)[1])))
+}
 
 const svg2 = d3.select("#vis-container2")
                 .append("svg")
@@ -62,11 +159,13 @@ const svg2 = d3.select("#vis-container2")
 
 const svg3 = d3.select("#vis-container3")
                     .append("svg")
+                    .attr("class", "svg3")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                     .attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
+              
 
 d3.csv("data/Purchase.csv").then((data) => {
 
@@ -132,6 +231,21 @@ function getByValue(map, searchVal) {
     }
   };
 }
+
+//helper function to get the Party and District for a given represenative
+function getPartyandDistrict(data, rep) {
+
+  let grouped = d3.group(data,  d => d.representative)
+
+  let district = getByValue(grouped, rep).get(rep)[0].district
+  let party = getByValue(grouped, rep).get(rep)[0].party
+
+  return {"district": district, "party": party}
+
+}
+
+
+
 // Aggregating data for congressman data
 function getAggregatedDataTopTraders(data, searchTicker) {
   let groupedTickers = d3.group(data, d => d.ticker);
@@ -282,14 +396,8 @@ function makeTop5TradersVis(tradeData) {
         .attr("width", xScale1.bandwidth()) 
         .style("fill", (data) => color(data.name))
         .style("opacity", 0.5)
-
-  //   svg2.append("text")
-  //   .attr("x", (width / 2))             
-  //   .attr("y", 445 - (margin.top / 2))
-  //   .attr("text-anchor", "middle")  
-  //   .style("font-size", "10px") 
-  //   .style("text-decoration", "underline")  
-  //   .text("Top 5 Congressional Traders by Volume");
+        .on("mouseover", mouseover2)
+        .on("mousemove",mousemove2)
 };
 
 function makeVolumeOverTimeVis(data) {
@@ -319,6 +427,8 @@ function makeVolumeOverTimeVis(data) {
     .domain([0,maxY3])
     .range([height, 0]);
 
+  console.log(yScale3(0))
+
   //Add y axis 
   svg3.append("g")
     .attr("transform", `translate(${125}, 0)`)
@@ -343,6 +453,11 @@ function makeVolumeOverTimeVis(data) {
       .x((d) => xScale3(d.date))
       .y((d) => yScale3(d.value))
       )
+      .on("mouseover", mouseover3)
+      .on("mousemove", mousemove3)
+
+
+     
 }
 
 
