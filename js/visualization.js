@@ -3,13 +3,6 @@ let margin = {top: 40, right: 20, bottom: 20, left: 20},
   width = 800 - margin.left - margin.right,
   height = 445 - margin.top - margin.bottom;
 
-// adds an svg within which to build
-let svg = d3.select("#vis-container")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // creating the first tool tip
 let Tooltip = d3.select("#vis-container")
@@ -58,6 +51,22 @@ let Tooltip3 = d3.select("#vis-container3")
 
 
 let clickedTicker;
+
+
+let mouseleave = function(d) {
+  console.log("MOUSE LEFT");
+  Tooltip.style("opacity", 0);
+}
+// adds an svg within which to build
+let svg = d3.select("#vis-container")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .on("mouseleave", mouseleave)
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
 
 //event handler for mouseClick
 let mouseClick = function(d) {
@@ -157,7 +166,6 @@ let mousemove3 = function(d) {
   .attr("r",2)
   .attr("fill", "black")
 }
-
 const svg2 = d3.select("#vis-container2")
                 .append("svg")
                 .attr("width", width + margin.left + margin.right + 100 )
@@ -474,7 +482,8 @@ function makeVolumeOverTimeVis(data) {
       .y((d) => yScale3(d.value))
       )
       .on("mouseover", mouseover3)
-      .on("mousemove", mousemove3)
+      .on("mousemove", mousemove3);
+
 
 
      
