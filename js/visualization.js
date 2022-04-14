@@ -130,7 +130,6 @@ let mousemove2 = function(d) {
     .style("top", (d.pageY + 5 + "px"))
     .text("District: "+getPartyandDistrict(tradingData,repName).district+", "+"Party: "+getPartyandDistrict(tradingData,repName).party)
 
-    console.log(d.target)
 }
 
 
@@ -252,7 +251,18 @@ function getPartyandDistrict(data, rep) {
 
 }
 
+// gets the party from the first example
+// helper function for getting AggregatedData for Top Traders
+function getParty(data, representative){
+  let party = null;
+  data.find(obj => {
+    if (obj.representative === representative) {
+      party = obj.party;
+    }
+  });
 
+  return party;
+}
 
 // Aggregating data for congressman data
 function getAggregatedDataTopTraders(data, searchTicker) {
@@ -276,8 +286,7 @@ function getAggregatedDataTopTraders(data, searchTicker) {
   let arrayOfInvestments = [];
 
   for (const obj of Object.entries(congressInvestments)) {
-
-    arrayOfInvestments.push({name: obj[0], value: obj[1]});
+    arrayOfInvestments.push({name: obj[0], value: obj[1], party: getParty(data, obj[0])});
   }
 
   const sortedInvestments = arrayOfInvestments.sort(function(obj1, obj2) {
@@ -332,6 +341,11 @@ function getAggregatedDataTradeVolume(data, searchTicker) {
 
 function makeTop5TradersVis(tradeData) {
   const data = tradeData.slice(0,5);
+
+  const colorByRep = {
+    "Republican": "red",
+    "Democrat": "blue"
+  };
 
   let x1, y1;
   let xKey, yKey;
@@ -402,7 +416,7 @@ function makeTop5TradersVis(tradeData) {
         .attr("y", (data) => yScale1(data.value)) 
         .attr("height", (data) => (height - margin.bottom) - yScale1(data.value)) 
         .attr("width", xScale1.bandwidth()) 
-        .style("fill", (data) => color(data.name))
+        .style("fill", (data) => colorByRep[data.party])
         .style("opacity", 0.5)
         .on("mouseover", mouseover2)
         .on("mousemove",mousemove2)
@@ -434,8 +448,6 @@ function makeVolumeOverTimeVis(data) {
   let yScale3 = d3.scaleLinear()
     .domain([0,maxY3])
     .range([height, 0]);
-
-  console.log(yScale3(0))
 
   //Add y axis 
   svg3.append("g")
