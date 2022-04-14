@@ -157,8 +157,6 @@ let mousemove3 = function(d) {
   .attr("cy",d3.pointer(d,this)[1])
   .attr("r",2)
   .attr("fill", "black")
-
-  console.log(d3.pointer(d,this))
 }
 
 const svg2 = d3.select("#vis-container2")
