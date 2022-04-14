@@ -149,6 +149,16 @@ let mousemove3 = function(d) {
     .style("left", (d.pageX + 10 + "px"))
     .style("top", (d.pageY + 5 + "px"))
     .text("$"+Intl.NumberFormat("en-US").format(yScale3Inverted(d3.pointer(d,this)[1])))
+
+  d3.selectAll("circle").remove()
+  //add a pointer to the tool tip
+  svg3.append("circle")
+  .attr("cx", d3.pointer(d,this)[0]+150)
+  .attr("cy",d3.pointer(d,this)[1])
+  .attr("r",2)
+  .attr("fill", "black")
+
+  console.log(d3.pointer(d,this))
 }
 
 const svg2 = d3.select("#vis-container2")
