@@ -475,10 +475,10 @@ function makeVolumeOverTimeVis(data) {
     .attr("font-size", '10px') 
     .call((g) => g.append("text")
                   .attr("x", 0)
-                  .attr("y", 0)
+                  .attr("y", -10)
                   .attr("fill", "black")
                   .attr("text-anchor", "end")
-                  .text("Volume of Transactions in USD"));
+                  .text("Amount ($)"));
 
 
   // Add line component
