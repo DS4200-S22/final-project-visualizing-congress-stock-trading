@@ -26,7 +26,7 @@ let Tooltip2 =  d3.select("#vis-container2")
 .attr("class", "tooltip")
 .style("background-color", "#B1DEDF")
 .style("border", "solid")
-.style("width", "120px")
+.style("width", "200px")
 .style("height", "60px")
 .style("top", "250px")
 .style("right", "250px")
@@ -135,7 +135,7 @@ let mousemove2 = function(d) {
   Tooltip2
     .style("left", (d.pageX + 10 + "px"))
     .style("top", (d.pageY + 5 + "px"))
-    .text("District: "+getPartyandDistrict(tradingData,repName).district+", "+"Party: "+getPartyandDistrict(tradingData,repName).party)
+    .text("District: "+getPartyandDistrict(tradingData,repName).district+", " + "Party: "+getPartyandDistrict(tradingData,repName).party)
 
 }
 
