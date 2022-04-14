@@ -53,19 +53,17 @@ let Tooltip3 = d3.select("#vis-container3")
 let clickedTicker;
 
 
-let mouseleave = function(d) {
-  console.log("MOUSE LEFT");
+let mouseleave1 = function(d) {
   Tooltip.style("opacity", 0);
 }
-// adds an svg within which to build
-let svg = d3.select("#vis-container")
-          .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-          .on("mouseleave", mouseleave)
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+let mouseleave2 = function(d) {
+  Tooltip2.style("opacity", 0);
+}
+
+let mouseleave3 = function(d) {
+  Tooltip3.style("opacity", 0);
+}
 
 
 //event handler for mouseClick
@@ -166,10 +164,22 @@ let mousemove3 = function(d) {
   .attr("r",2)
   .attr("fill", "black")
 }
+
+// adds an svg within which to build
+let svg = d3.select("#vis-container")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .on("mouseleave", mouseleave1)
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
 const svg2 = d3.select("#vis-container2")
                 .append("svg")
                 .attr("width", width + margin.left + margin.right + 100 )
                 .attr("height", height - margin.top - margin.bottom)
+                .on("mouseleave", mouseleave2)
                 .attr("viewBox", [0, 0, width, height]); 
 
 const svg3 = d3.select("#vis-container3")
@@ -178,6 +188,7 @@ const svg3 = d3.select("#vis-container3")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
+                    .on("mouseleave", mouseleave3)
                     .attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
               
