@@ -26,7 +26,7 @@ h3 {
   width: 50%;
   height: 100%;
   /* max-width: 65%; */
-  margin: 40px auto;
+  /* margin: 40px auto; */
 }
 
 .full-vis-container {
@@ -34,5 +34,18 @@ h3 {
 }
 
 .explaination-text {
-  margin-top: 50px;
+  margin-top: 40px;
+  border: solid 1px black;
+  padding: 10px;
+}
+
+.reset {
+  display: inline;
+  font-size: 20px;
+  border: solid 1px black;
+  margin-bottom: 25px;
+}
+
+.instructions {
+  font-weight: 300;
 }

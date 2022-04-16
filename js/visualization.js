@@ -475,7 +475,7 @@ function makeVolumeOverTimeVis(data) {
     .attr("font-size", '10px') 
     .call((g) => g.append("text")
                   .attr("x", 0)
-                  .attr("y", -10)
+                  .attr("y", -12)
                   .attr("fill", "black")
                   .attr("text-anchor", "end")
                   .text("Amount ($)"));
@@ -507,4 +507,3 @@ function makeVolumeOverTimeVis(data) {
   const volumeData = getAggregatedDataTradeVolume(tradingData);
   makeVolumeOverTimeVis(volumeData);
 });
-
