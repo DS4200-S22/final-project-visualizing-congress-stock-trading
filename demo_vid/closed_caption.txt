@@ -1,0 +1,7 @@
+22:14:06 demonstration, can you for to take it on? Hello! This is the demonstration video for our project on visualizing Congressional trading data.
+22:14:27 So on our Github page under the visualizations section you'll see 3 main charts the largest.
+22:14:34 The most important view being this tree map on the top of the assets most largely traded by members of Congress in terms of volume dollar volume of trades.
+22:14:45 So the largest you'll see on the left by hovering over is Microsoft, followed by Apple and Tesla.
+22:14:50 If you've been following these with all you know they are 3 of the largest companies in the world, and have been extremely lucrative to invest in over the last couple of years, these 2 charts at the bottom show data currently
+22:15:04 representative of our entire data set. the first being the 5 members of Congress, with the most trading activity over the course of our data set with their cut, the color representing their political affiliation.
+22:15:18 And we also have on the right the trading volume of all of Congress over the course of our data set.
