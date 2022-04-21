@@ -6,10 +6,10 @@ Hello, this is the demonstration video on our project for visualizing congressio
 
 2
 00:00:08.100 --> 00:00:14.000
-So on our Github page under the visualizations section you'll see 3 main charts the largest.
+So on our Github page under the visualizations section you'll see 3 main charts.
 
 3
-00:00:014.100 --> 00:00:26.000
+00:00:14.100 --> 00:00:26.000
 The most important view being this tree map on the top of the assets most largely traded by members of Congress in terms of volume dollar volume of trades.
 
 4
@@ -17,29 +17,33 @@ The most important view being this tree map on the top of the assets most largel
 So the largest you'll see on the left by hovering over is Microsoft, followed by Apple and Tesla.
 
 5
-00:00:031.100 --> 00:00:45.000
-If you've been following these with all you know they are 3 of the largest companies in the world, and have been extremely lucrative to invest in over the last couple of years, these 2 charts at the bottom show data currently
+00:00:31.100 --> 00:00:42.000
+If you've been following these with all you know they are 3 of the largest companies in the world, and have been extremely lucrative to invest in over the last couple of years, 
 
 6
-00:00:45.100 --> 00:00:59.000
-representative of our entire data set. the first being the 5 members of Congress, with the most trading activity over the course of our data set with their cut, the color representing their political affiliation.
+00:00:42.100 --> 00:00:46.500
+these 2 charts at the bottom show data currently representative of our entire data set.
 
 7
-00:01:00.100 --> 01:01:07.000
-And we also have on the right the trading volume of all of Congress over the course of our data set.
+00:00:46.600 --> 00:00:59.000
+The first being the 5 members of Congress, with the most trading activity over the course of our data set with their color representing their political affiliation.
 
 8
+00:01:00.100 --> 00:01:07.000
+And we also have on the right the trading volume of all of Congress over the course of our data set.
+
+9
 00:01:07.100 --> 00:01:11.000
 and again, you can hover over any point to see how much money was traded on that day.
 
-9
+10
 00:01:11.100 --> 00:01:20.000
 clicking on a box on the tree map will filter these bottom two charts to that specific security
 
-10
-00:01:20.100 --> 00:01:27.000
-So if we look at apple, we can see for example nancy pelosi has traded the most apple at this time 
-
 11
+00:01:20.100 --> 00:01:27.000
+So if we look at apple, we can see, for example, Nancy Pelosi has traded the most $Apple at this time 
+
+12
 00:01:27.100 --> 00:01:40.000
-and the largest trades were in april july and october of 2020 and this can be done for any stock you see up here on this tree map. So, Thank you
+and the largest trades were in April, July and October of 2020 and this can be done for any stock you see up here on this tree map. Thank you
