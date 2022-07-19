@@ -1,10 +1,10 @@
-# DS4200 S22 Final Project
+# Visualizing Congress Stock Trading
 
-This template is the starting point for your final project's webpage. Please read all of the information  below. 
+This project aims to draw conclusions from the trades completed by memebers of Congress.
 
 ## Link to Project Webpage
 
-[Link to Project GitHub Page] https://ds4200-s22.github.io/final-project-visualizing-congress-stock-trading/
+Access the github page here: https://ds4200-s22.github.io/final-project-visualizing-congress-stock-trading/
 
 ## Setup
 
