@@ -38,3 +38,12 @@ Overview of the files and folders provided in your repo.
 
 * `lib` will contain any JavaScript library you use. It currently includes D3. To ensure long-term survivability, *use the included D3 here rather than linking to [d3js.org](https://d3js.org) or some other CDN.* Likewise, put your other libraries here rather than loading them from elsewhere.
 
+
+
+# Examples of the tool use:
+
+### Viewing which party trades individual stocks  
+<img width="1047" alt="image" src="https://user-images.githubusercontent.com/10816901/179807101-439e014f-2a89-4eb7-a978-74c8b9a3f5d8.png">
+
+After clicking on an energy stock, such as USAC, you can see the bar chart shows only republicans have made significant investment, and on something like DIS, an entertainment stock, the main traders are democrats. Users can make their own judgement but it would be easy to guess democrats stay away from energy and invest their money in things that would not damage their political image
+
