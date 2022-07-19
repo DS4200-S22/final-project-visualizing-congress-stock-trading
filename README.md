@@ -10,7 +10,7 @@ Access the github page here: https://ds4200-s22.github.io/final-project-visualiz
 
 The tool has already been created and can be viewed in the link above, no extra setup required. Upon loading the page (optimized for desktop), the user can navigate to the gray section of the landing page, this is where the tool lives. 
 
-The user can easily see the 3 charts, and interact with all three. Start by picking a stock you would like to see specifics on.
+The user can easily see the 3 charts, and interact with all three. Simply start by picking a stock you would like to see specifics on.
 
 ## Organization
 
